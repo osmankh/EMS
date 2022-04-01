@@ -62,6 +62,9 @@
         ],
         "fixer": [
             "vendor/bin/php-cs-fixer fix -v"
+        ],
+        "test": [
+            "symfony php bin/phpunit tests"
         ]
     },
     "conflict": {
