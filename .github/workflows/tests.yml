@@ -13,10 +13,7 @@ jobs:
   symfony-tests:
     runs-on: ubuntu-latest
     steps:
-    #  To automatically get bug fixes and new Php versions for shivammathur/setup-php,
-    # change this to (see https://github.com/shivammathur/setup-php#bookmark-versioning):
-    # uses: shivammathur/setup-php@v2
-    - uses: shivammathur/setup-php@2cb9b829437ee246e9b3cac53555a39208ca6d28
+    - uses: shivammathur/setup-php@v2
       with:
         php-version: '8.0'
     - uses: actions/checkout@v3
@@ -36,6 +33,8 @@ jobs:
       run: |
         mkdir -p data
         touch data/database.sqlite
+    - name: Execute PHP-CS-FIXER
+      run: composer run fixer
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
         DATABASE_URL: sqlite:///%kernel.project_dir%/data/database.sqlite
