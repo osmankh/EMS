@@ -25,6 +25,7 @@ final class Version20220401212046 extends AbstractMigration
         $this->addSql('CREATE TABLE expense (id INT NOT NULL, expense_type_id INT NOT NULL, description VARCHAR(255) NOT NULL, value DOUBLE PRECISION NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_2D3A8DA6A857C7A9 ON expense (expense_type_id)');
         $this->addSql('CREATE TABLE expense_type (id INT NOT NULL, name VARCHAR(64) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX expense_type_unique ON expense_type (name)');
         $this->addSql('ALTER TABLE expense ADD CONSTRAINT FK_2D3A8DA6A857C7A9 FOREIGN KEY (expense_type_id) REFERENCES expense_type (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 

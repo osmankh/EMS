@@ -8,6 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ExpenseTypeRepository::class)]
+#[ORM\UniqueConstraint(
+    name: 'expense_type_unique',
+    columns: ['name']
+)]
 class ExpenseType
 {
     #[ORM\Id]

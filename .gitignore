@@ -10,7 +10,7 @@
 ###< symfony/framework-bundle ###
 
 .idea
-postgres/*
+postgres
 
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
