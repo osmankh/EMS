@@ -32,7 +32,7 @@ class ExpenseTest extends KernelTestCase
     }
 
     /** @test */
-    public function shouldHaveFourExpenseTypesFixturesFromStart()
+    public function shouldHaveFiveExpenseTypesFixturesFromStart()
     {
         $expenseTypeRepository = $this->entityManager->getRepository(ExpenseType::class);
 

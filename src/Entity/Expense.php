@@ -16,21 +16,21 @@ class Expense
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    public $id;
 
     /**
      * @var string
      * @OA\Property(description="The description of the Expense.")
      */
     #[ORM\Column(type: 'string', length: 255)]
-    private $description;
+    public $description;
 
     /**
      * @var float
      * @OA\Property(description="The Value of the Expense.")
      */
     #[ORM\Column(type: 'float')]
-    private $value;
+    public $value;
 
     /**
      * @var string
@@ -38,7 +38,7 @@ class Expense
      */
     #[ORM\ManyToOne(targetEntity: ExpenseType::class, inversedBy: 'expenses')]
     #[ORM\JoinColumn(nullable: false)]
-    private $expenseType;
+    public $expenseType;
 
     public function getId(): ?int
     {

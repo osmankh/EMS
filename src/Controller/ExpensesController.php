@@ -12,6 +12,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ExpensesController extends AbstractController
 {
+    public function __construct(protected ExpenseRepository $repository)
+    {
+    }
+
     /**
      * List all expenses.
      *
@@ -26,8 +30,8 @@ class ExpensesController extends AbstractController
      * @OA\Tag(name="expenses")
      */
     #[Route('/api/expenses', name: 'app_expenses', methods: ['GET', 'HEAD'])]
-    public function getExpenses(ExpenseRepository $repository): Response
+    public function getExpenses(): Response
     {
-        return $this->json($repository->findAll());
+        return $this->json($this->repository->findAll());
     }
 }
