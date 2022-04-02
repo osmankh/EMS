@@ -10,6 +10,8 @@
         "doctrine/doctrine-bundle": "^2.6",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.11",
+        "nelmio/api-doc-bundle": "^4.8",
+        "symfony/asset": "6.0.*",
         "symfony/console": "6.0.*",
         "symfony/dotenv": "6.0.*",
         "symfony/flex": "^2",
@@ -17,6 +19,7 @@
         "symfony/maker-bundle": "^1.38",
         "symfony/proxy-manager-bridge": "6.0.*",
         "symfony/runtime": "6.0.*",
+        "symfony/twig-bundle": "6.0.*",
         "symfony/yaml": "6.0.*"
     },
     "config": {
@@ -60,12 +63,9 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "fixer": [
-            "vendor/bin/php-cs-fixer fix -v"
-        ],
-        "test": [
-            "symfony php bin/phpunit tests"
-        ]
+        "cs": "vendor/bin/php-cs-fixer fix -v",
+        "lint": "@cs --dry-run",
+        "test": "symfony php bin/phpunit tests"
     },
     "conflict": {
         "symfony/symfony": "*"

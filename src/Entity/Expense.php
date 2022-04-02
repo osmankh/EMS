@@ -4,21 +4,38 @@ namespace App\Entity;
 
 use App\Repository\ExpenseRepository;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Annotations as OA;
 
 #[ORM\Entity(repositoryClass: ExpenseRepository::class)]
 class Expense
 {
+    /**
+     * @var int
+     * @OA\Property(description="The unique identifier of the Expense.")
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    /**
+     * @var string
+     * @OA\Property(description="The description of the Expense.")
+     */
     #[ORM\Column(type: 'string', length: 255)]
     private $description;
 
+    /**
+     * @var float
+     * @OA\Property(description="The Value of the Expense.")
+     */
     #[ORM\Column(type: 'float')]
     private $value;
 
+    /**
+     * @var string
+     * @OA\Property(description="The Type of the Expense.")
+     */
     #[ORM\ManyToOne(targetEntity: ExpenseType::class, inversedBy: 'expenses')]
     #[ORM\JoinColumn(nullable: false)]
     private $expenseType;
