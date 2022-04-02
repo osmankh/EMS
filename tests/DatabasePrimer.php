@@ -2,6 +2,7 @@
 
 namespace App\Tests;
 
+use App\DataFixtures\AppFixtures;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -21,5 +22,9 @@ class DatabasePrimer
         $metadatas = $entityManager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->updateSchema($metadatas);
+
+        // Run DB Fixtures
+        $appFixtures = new AppFixtures();
+        $appFixtures->load($entityManager);
     }
 }
