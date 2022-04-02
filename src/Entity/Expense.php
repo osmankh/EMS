@@ -33,7 +33,7 @@ class Expense
     public $value;
 
     /**
-     * @var string
+     * @var int
      * @OA\Property(description="The Type of the Expense.")
      */
     #[ORM\ManyToOne(targetEntity: ExpenseType::class, inversedBy: 'expenses')]
