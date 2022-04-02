@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\ExpenseType;
+use App\Enums\ExpenseTypeEnum;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -16,11 +17,11 @@ class AppFixtures extends Fixture
     private static function seedExpenses(ObjectManager $manager)
     {
         $expenseTypes = [
-            'Entertainment',
-            'Food',
-            'Bills',
-            'Transport',
-            'Other',
+            ExpenseTypeEnum::ENTERTAINMENT,
+            ExpenseTypeEnum::FOOD,
+            ExpenseTypeEnum::BILLS,
+            ExpenseTypeEnum::TRANSPORT,
+            ExpenseTypeEnum::OTHER,
         ];
 
         foreach ($expenseTypes as $expenseType) {

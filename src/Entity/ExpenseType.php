@@ -17,10 +17,10 @@ class ExpenseType
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    public $id;
 
     #[ORM\Column(type: 'string', length: 64)]
-    private $name;
+    public $name;
 
     #[ORM\OneToMany(mappedBy: 'expenseType', targetEntity: Expense::class)]
     private $expenses;
