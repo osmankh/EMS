@@ -65,7 +65,9 @@ class ExpensesController extends AbstractController
     #[Route('/expenses', name: 'post_expenses', methods: ['POST'])]
     public function postExpense(CreateExpenseRequestDto $createExpenseDto): Response
     {
-        $createExpenseDto->validate();
+        if (!$createExpenseDto->valid()) {
+            return $createExpenseDto->validationResponse();
+        }
 
         if (is_numeric($createExpenseDto->getType())) {
             $expenseType = $this->typeRepository->find($createExpenseDto->getType());

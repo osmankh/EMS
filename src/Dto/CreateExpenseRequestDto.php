@@ -2,22 +2,31 @@
 
 namespace App\Dto;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class CreateExpenseRequestDto extends BaseRequestDto
 {
-    #[Type('string')]
-    #[NotBlank()]
-    protected string $description;
+    #[Assert\Type('string')]
+    #[Assert\NotBlank()]
+    protected $description;
 
-    #[Type('float')]
-    #[NotBlank()]
-    protected float $value;
+    #[Assert\Type([
+        'float',
+        'integer',
+    ])]
+    #[Assert\NotBlank()]
+    #[Assert\Positive()]
+    protected $value;
 
-    #[Type('string')]
-    #[NotBlank()]
-    protected string $type;
+    #[Assert\Type(
+        type: [
+            'string',
+            'integer',
+        ],
+        message: 'The value {{ value }} is not a valid {{ type }} name or id',
+    )]
+    #[Assert\NotBlank()]
+    protected $type;
 
     public function getDescription(): string
     {
@@ -34,8 +43,27 @@ class CreateExpenseRequestDto extends BaseRequestDto
         return $this->type;
     }
 
-    protected function autoValidateRequest(): bool
+    /**
+     * @param $description
+     */
+    public function setDescription($description): void
     {
-        return false;
+        $this->description = $description;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setValue($value): void
+    {
+        $this->value = $value;
+    }
+
+    /**
+     * @param $type
+     */
+    public function setType($type): void
+    {
+        $this->type = $type;
     }
 }

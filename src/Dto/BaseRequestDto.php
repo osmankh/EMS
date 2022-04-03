@@ -12,13 +12,27 @@ abstract class BaseRequestDto
     public function __construct(protected ValidatorInterface $validator)
     {
         $this->populate();
-
-        if ($this->autoValidateRequest()) {
-            $this->validate();
-        }
     }
 
-    public function validate()
+    public function valid(): bool
+    {
+        $messages = $this->validate();
+
+        if (count($messages['errors']) > 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function validationResponse(): JsonResponse
+    {
+        $messages = $this->validate();
+
+        return new JsonResponse($messages, 400);
+    }
+
+    private function validate()
     {
         $errors = $this->validator->validate($this);
 
@@ -33,12 +47,7 @@ abstract class BaseRequestDto
             ];
         }
 
-        if (count($messages['errors']) > 0) {
-            $response = new JsonResponse($messages, 201);
-            $response->send();
-
-            exit;
-        }
+        return $messages;
     }
 
     public function getRequest(): Request
@@ -48,10 +57,14 @@ abstract class BaseRequestDto
 
     protected function populate(): void
     {
-        foreach ($this->getRequest()->toArray() as $property => $value) {
-            if (property_exists($this, $property)) {
-                $this->{$property} = $value;
+        try {
+            foreach ($this->getRequest()->toArray() as $property => $value) {
+                if (property_exists($this, $property)) {
+                    $this->{$property} = $value;
+                }
             }
+        } catch (\Exception) {
+
         }
     }
 
