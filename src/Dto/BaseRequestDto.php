@@ -64,7 +64,6 @@ abstract class BaseRequestDto
                 }
             }
         } catch (\Exception) {
-
         }
     }
 
