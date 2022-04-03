@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Tests\unit\Entity;
+namespace App\Tests;
 
 use App\Entity\Expense;
 use App\Entity\ExpenseType;
 use App\Enums\ExpenseTypeEnum;
-use App\Tests\DatabasePrimer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 

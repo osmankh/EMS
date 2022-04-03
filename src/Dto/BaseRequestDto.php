@@ -32,7 +32,7 @@ abstract class BaseRequestDto
         return new JsonResponse($messages, 400);
     }
 
-    private function validate()
+    public function validate()
     {
         $errors = $this->validator->validate($this);
 
