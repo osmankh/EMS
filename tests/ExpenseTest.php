@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Tests\unit\Entity;
+namespace App\Tests;
 
 use App\Entity\Expense;
 use App\Entity\ExpenseType;
 use App\Enums\ExpenseTypeEnum;
-use App\Tests\DatabasePrimer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -34,6 +33,7 @@ class ExpenseTest extends KernelTestCase
     /** @test */
     public function shouldHaveFiveExpenseTypesFixturesFromStart()
     {
+        // Arrange
         $expenseTypeRepository = $this->entityManager->getRepository(ExpenseType::class);
 
         $expenseTypes = [
@@ -45,18 +45,25 @@ class ExpenseTest extends KernelTestCase
         ];
 
         foreach ($expenseTypes as $expenseType) {
+            // Act
             /** @var ExpenseType $expenseTypeRecord */
             $expenseTypeRecord = $expenseTypeRepository->findOneBy(['name' => $expenseType]);
+
+            // Assert
             $this->assertNotEmpty($expenseTypeRecord);
         }
 
+        // Act
         $allExpenseTypeCount = $expenseTypeRepository->count([]);
-        $this->assertEquals(count($expenseTypes), $allExpenseTypeCount);
+
+        // Assert
+        $this->assertSame(count($expenseTypes), $allExpenseTypeCount);
     }
 
     /** @test */
     public function anExpenseCanBeCreatedInTheDatabase()
     {
+        // Arrange
         $expenseTypeRepository = $this->entityManager->getRepository(ExpenseType::class);
 
         /** @var ExpenseType $expenseTypeRecord */
@@ -70,6 +77,7 @@ class ExpenseTest extends KernelTestCase
         $expense->setValue($expenseValue);
         $expense->setExpenseType($expenseTypeRecord);
 
+        // Act
         $this->entityManager->persist($expense);
         $this->entityManager->flush();
 
@@ -81,8 +89,9 @@ class ExpenseTest extends KernelTestCase
             'value' => $expenseValue,
         ]);
 
-        $this->assertEquals($expenseDescription, $expenseRecord->getDescription());
-        $this->assertEquals($expenseValue, $expenseRecord->getValue());
-        $this->assertEquals(ExpenseTypeEnum::ENTERTAINMENT, $expenseRecord->getExpenseType()->getName());
+        // Assert
+        $this->assertSame($expenseDescription, $expenseRecord->getDescription());
+        $this->assertSame($expenseValue, $expenseRecord->getValue());
+        $this->assertSame(ExpenseTypeEnum::ENTERTAINMENT, $expenseRecord->getExpenseType()->getName());
     }
 }

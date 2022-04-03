@@ -7,33 +7,57 @@ use App\Entity\Expense;
 use App\Entity\ExpenseType;
 use App\Enums\ExpenseTypeEnum;
 use App\Repository\ExpenseRepository;
+use App\Repository\ExpenseTypeRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 class ExpensesControllerTest extends TestCase
 {
-    /** @test */
-    public function getExpensesShouldReturnExpectedResponse(): void
+    protected ExpensesController $controller;
+    protected Expense $expenseMock;
+
+    public function setUp(): void
     {
-        $expenseMock = new Expense();
-        $expenseMock->setDescription('Expense Mock');
-        $expenseMock->setValue(10);
+        parent::setUp();
+        $this->expenseMock = new Expense();
+        $this->expenseMock->id = 1;
+        $this->expenseMock->setDescription('Expense Mock');
+        $this->expenseMock->setValue(10);
 
         $expenseTypeMock = new ExpenseType();
         $expenseTypeMock->setName(ExpenseTypeEnum::ENTERTAINMENT);
-        $expenseMock->setExpenseType($expenseTypeMock);
+        $this->expenseMock->setExpenseType($expenseTypeMock);
 
         /** @var ExpenseRepository $expenseRepositoryMock */
         $expenseRepositoryMock = $this->createMock(ExpenseRepository::class);
         $expenseRepositoryMock
             ->method('findAll')
-            ->willReturn([$expenseMock]);
+            ->willReturn([$this->expenseMock]);
 
-        $controller = new ExpensesController($expenseRepositoryMock);
+        /** @var ExpenseTypeRepository $expenseTypeRepositoryMock */
+        $expenseTypeRepositoryMock = $this->createMock(ExpenseTypeRepository::class);
+
+        $this->controller = new ExpensesController($expenseRepositoryMock, $expenseTypeRepositoryMock);
+    }
+
+    /** @test */
+    public function getExpensesShouldReturnExpectedResponse(): void
+    {
+        // Arrange
+        $expected = (object) [
+            'id' => $this->expenseMock->getId(),
+            'description' => $this->expenseMock->getDescription(),
+            'value' => $this->expenseMock->getValue(),
+            'type' => $this->expenseMock->getExpenseType()->getName(),
+        ];
 
         $container = $this->createMock(ContainerInterface::class);
-        $controller->setContainer($container);
+        $this->controller->setContainer($container);
 
-        $this->assertEquals(json_encode([$expenseMock]), $controller->getExpenses()->getContent());
+        // Act
+        $content = $this->controller->getExpenses()->getContent();
+
+        // Assert
+        $this->assertSame(json_encode([$expected]), $content);
     }
 }

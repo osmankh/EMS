@@ -3,7 +3,6 @@
 namespace App\Tests;
 
 use App\DataFixtures\AppFixtures;
-use App\DataFixtures\TestFixtures;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\HttpKernel\KernelInterface;
 

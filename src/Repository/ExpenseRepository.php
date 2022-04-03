@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Expense;
+use App\Entity\ExpenseType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -45,32 +46,13 @@ class ExpenseRepository extends ServiceEntityRepository
         }
     }
 
-    // /**
-    //  * @return Expense[] Returns an array of Expense objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public static function create(string $description, string $value, ExpenseType $type): Expense
     {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $entity = new Expense();
+        $entity->setDescription($description);
+        $entity->setValue($value);
+        $entity->setExpenseType($type);
 
-    /*
-    public function findOneBySomeField($value): ?Expense
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        return $entity;
     }
-    */
 }
