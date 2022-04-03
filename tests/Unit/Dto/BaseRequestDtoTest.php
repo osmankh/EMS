@@ -39,7 +39,7 @@ class BaseRequestDtoTest extends TestCase
         $isValid = $this->testBaseRequest->valid();
 
         // Assert
-        $this->assertEquals(false, $isValid);
+        $this->assertSame(false, $isValid);
     }
 
     /** @test */
@@ -51,7 +51,7 @@ class BaseRequestDtoTest extends TestCase
         // Assert
         $this->assertArrayHasKey('errors', $errors);
         $this->assertCount(1, $errors['errors']);
-        $this->assertEquals('validation_failed', $errors['message']);
+        $this->assertSame('validation_failed', $errors['message']);
         $this->assertArrayHasKey('message', $errors);
     }
 
@@ -62,6 +62,6 @@ class BaseRequestDtoTest extends TestCase
         $response = $this->testBaseRequest->validationResponse();
 
         // Assert
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertSame(400, $response->getStatusCode());
     }
 }

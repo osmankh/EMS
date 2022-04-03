@@ -67,7 +67,7 @@ class ExpensesControllerTest extends WebTestCase
         $response = $controller->getExpenses();
 
         // Assert
-        $this->assertEquals('[]', $response->getContent());
+        $this->assertSame('[]', $response->getContent());
     }
 
     /** @test */
@@ -89,10 +89,10 @@ class ExpensesControllerTest extends WebTestCase
         $actualExpense = $expensesResponse[0];
 
         // Assert
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertNotEmpty($expensesResponse);
-        $this->assertEquals($expectedExpense->description, $actualExpense->description);
-        $this->assertEquals($expectedExpense->value, $actualExpense->value);
+        $this->assertSame($expectedExpense->description, $actualExpense->description);
+        $this->assertSame($expectedExpense->value, $actualExpense->value);
     }
 
     /** @test
@@ -117,7 +117,7 @@ class ExpensesControllerTest extends WebTestCase
         $response = $this->controller->postExpense($createExpenseDto);
 
         // Assert
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertSame(400, $response->getStatusCode());
     }
 
     public function postExpenseBadBodyProvider(): array
@@ -217,15 +217,15 @@ class ExpensesControllerTest extends WebTestCase
         $response = $this->controller->postExpense($createExpenseDto);
 
         // Assert
-        $this->assertEquals(201, $response->getStatusCode(), 'Should return 201 status code');
+        $this->assertSame(201, $response->getStatusCode(), 'Should return 201 status code');
         $expenseRepository = $this->entityManager->getRepository(Expense::class);
         /** @var Expense $actualExpense */
         $actualExpense = $expenseRepository->findOneBy([
             'description' => $expectedExpense['description'],
         ]);
-        $this->assertEquals($expectedExpense['description'], $actualExpense->getDescription(), 'Saved Expense description match payload description');
+        $this->assertSame($expectedExpense['description'], $actualExpense->getDescription(), 'Saved Expense description match payload description');
         $this->assertEquals($expectedExpense['value'], $actualExpense->getValue(), 'Saved Expense value match payload value');
-        $this->assertEquals($expectedExpense['type'], $actualExpense->getExpenseType()->getName(), 'Saved Expense type match payload type');
+        $this->assertSame($expectedExpense['type'], $actualExpense->getExpenseType()->getName(), 'Saved Expense type match payload type');
     }
 
     /** @test */
@@ -254,16 +254,16 @@ class ExpensesControllerTest extends WebTestCase
         $response = $this->controller->postExpense($createExpenseDto);
 
         // Assert
-        $this->assertEquals(201, $response->getStatusCode(), 'Should return 201 status code');
+        $this->assertSame(201, $response->getStatusCode(), 'Should return 201 status code');
 
         $expenseRepository = $this->entityManager->getRepository(Expense::class);
         /** @var Expense $actualExpense */
         $actualExpense = $expenseRepository->findOneBy([
             'description' => $expectedExpense['description'],
         ]);
-        $this->assertEquals($expectedExpense['description'], $actualExpense->getDescription(), 'Saved Expense description match payload description');
+        $this->assertSame($expectedExpense['description'], $actualExpense->getDescription(), 'Saved Expense description match payload description');
         $this->assertEquals($expectedExpense['value'], $actualExpense->getValue(), 'Saved Expense value match payload value');
-        $this->assertEquals($expenseType->getName(), $actualExpense->getExpenseType()->getName(), 'Saved Expense type match payload type');
-        $this->assertEquals($expenseType->getId(), $actualExpense->getExpenseType()->getId(), 'Saved Expense type Id match payload type Id');
+        $this->assertSame($expenseType->getName(), $actualExpense->getExpenseType()->getName(), 'Saved Expense type match payload type');
+        $this->assertSame($expenseType->getId(), $actualExpense->getExpenseType()->getId(), 'Saved Expense type Id match payload type Id');
     }
 }

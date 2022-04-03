@@ -57,7 +57,7 @@ class ExpenseTest extends KernelTestCase
         $allExpenseTypeCount = $expenseTypeRepository->count([]);
 
         // Assert
-        $this->assertEquals(count($expenseTypes), $allExpenseTypeCount);
+        $this->assertSame(count($expenseTypes), $allExpenseTypeCount);
     }
 
     /** @test */
@@ -90,8 +90,8 @@ class ExpenseTest extends KernelTestCase
         ]);
 
         // Assert
-        $this->assertEquals($expenseDescription, $expenseRecord->getDescription());
-        $this->assertEquals($expenseValue, $expenseRecord->getValue());
-        $this->assertEquals(ExpenseTypeEnum::ENTERTAINMENT, $expenseRecord->getExpenseType()->getName());
+        $this->assertSame($expenseDescription, $expenseRecord->getDescription());
+        $this->assertSame($expenseValue, $expenseRecord->getValue());
+        $this->assertSame(ExpenseTypeEnum::ENTERTAINMENT, $expenseRecord->getExpenseType()->getName());
     }
 }

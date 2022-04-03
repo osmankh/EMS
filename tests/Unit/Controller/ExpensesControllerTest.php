@@ -58,6 +58,6 @@ class ExpensesControllerTest extends TestCase
         $content = $this->controller->getExpenses()->getContent();
 
         // Assert
-        $this->assertEquals(json_encode([$expected]), $content);
+        $this->assertSame(json_encode([$expected]), $content);
     }
 }

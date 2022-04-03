@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Listeners;
+namespace App\Tests\Integration\Listeners;
 
 use App\Exceptions\NotFoundException;
 use App\Listeners\ExceptionListener;
@@ -43,7 +43,7 @@ class ExceptionListenerTest extends KernelTestCase
 
         // Assert
         $actual = $exceptionEventMock->getResponse()->getStatusCode();
-        $this->assertEquals(404, $actual);
+        $this->assertSame(404, $actual);
     }
 
     /** @test */
@@ -57,7 +57,7 @@ class ExceptionListenerTest extends KernelTestCase
 
         // Assert
         $actual = $exceptionEventMock->getResponse()->getStatusCode();
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /** @test */
@@ -71,6 +71,6 @@ class ExceptionListenerTest extends KernelTestCase
 
         // Assert
         $actual = $exceptionEventMock->getResponse()->getStatusCode();
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 }
