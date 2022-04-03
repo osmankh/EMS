@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Dto\CreateExpenseRequestDto;
+use App\Dto\ExpenseResponseDto;
 use App\Entity\Expense;
 use App\Exceptions\NotFoundException;
+use App\Mappers\ExpenseMapper;
 use App\Repository\ExpenseRepository;
 use App\Repository\ExpenseTypeRepository;
 use Doctrine\ORM\OptimisticLockException;
@@ -46,6 +48,8 @@ class ExpensesController extends AbstractController
     {
         $data = $this->repository->findAll();
 
+        $data = array_map(fn ($expense): ExpenseResponseDto => ExpenseMapper::entityToResponseDto($expense), $data);
+
         return new JsonResponse($data, 200, ['Content-Type' => 'application/json']);
     }
 
@@ -83,6 +87,6 @@ class ExpensesController extends AbstractController
             throw new NotFoundException('ExpenseType', $createExpenseDto->getType());
         }
 
-        return new JsonResponse([], 201, ['Content-Type' => 'application/json']);
+        return new JsonResponse(ExpenseMapper::entityToResponseDto($entity), 201, ['Content-Type' => 'application/json']);
     }
 }

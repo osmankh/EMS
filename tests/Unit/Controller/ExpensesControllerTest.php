@@ -20,6 +20,7 @@ class ExpensesControllerTest extends TestCase
     {
         parent::setUp();
         $this->expenseMock = new Expense();
+        $this->expenseMock->id = 1;
         $this->expenseMock->setDescription('Expense Mock');
         $this->expenseMock->setValue(10);
 
@@ -42,10 +43,16 @@ class ExpensesControllerTest extends TestCase
     /** @test */
     public function getExpensesShouldReturnExpectedResponse(): void
     {
+        $expected = (object) [
+            'id' => $this->expenseMock->getId(),
+            'description' => $this->expenseMock->getDescription(),
+            'value' => $this->expenseMock->getValue(),
+            'type' => $this->expenseMock->getExpenseType()->getName(),
+        ];
 
         $container = $this->createMock(ContainerInterface::class);
         $this->controller->setContainer($container);
 
-        $this->assertEquals(json_encode([$this->expenseMock]), $this->controller->getExpenses()->getContent());
+        $this->assertEquals(json_encode([$expected]), $this->controller->getExpenses()->getContent());
     }
 }
