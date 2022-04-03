@@ -36,7 +36,7 @@ class ExpensesController extends AbstractController
      *     description="Returns a list of expenses",
      *     @OA\JsonContent(
      *        type="array",
-     *        @OA\Items(ref=@Model(type=Expense::class, groups={"full"}))
+     *        @OA\Items(ref=@Model(type=ExpenseResponseDto::class))
      *     )
      * )
      * @OA\Tag(name="expenses")
@@ -55,6 +55,42 @@ class ExpensesController extends AbstractController
 
     /**
      * Add an expense.
+     *
+     * @OA\Response(
+     *     response=201,
+     *     description="Returns created expense",
+     *     @OA\JsonContent(ref=@Model(type=ExpenseResponseDto::class))
+     * )
+     *
+     * @OA\Response(
+     *     response=400,
+     *     description="Bad Request"
+     * )
+     * @OA\RequestBody(
+     *      description="Expense details",
+     *      @OA\MediaType(
+     *          mediaType="application/json",
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="description",
+     *                  description="Description of the Expense",
+     *                  type="string",
+     *              ),
+     *              @OA\Property(
+     *                  property="value",
+     *                  description="Value of the Expense",
+     *                  type="float"
+     *              ),
+     *              @OA\Property(
+     *                  property="type",
+     *                  description="Type of the Expense, you can specifies it by the Type name of id - (eg. 'Entertainment' or 1)",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     * @OA\Tag(name="expenses")
      *
      * @param CreateExpenseRequestDto $createExpenseDto
      *
