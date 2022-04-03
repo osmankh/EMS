@@ -58,11 +58,15 @@ class ExpensesControllerTest extends WebTestCase
     /** @test */
     public function getExpensesShouldReturnEmptyData(): void
     {
+        // Arrange
         $container = static::getContainer();
         /** @var ExpensesController $controller */
         $controller = $container->get(ExpensesController::class);
+
+        // Act
         $response = $controller->getExpenses();
 
+        // Assert
         $this->assertEquals('[]', $response->getContent());
     }
 
@@ -99,6 +103,7 @@ class ExpensesControllerTest extends WebTestCase
     public function postExpenseShouldReturnBadRequest(
         object $jsonBody,
     ): void {
+        // Arrange
         /** @var ValidatorInterface $validator */
         $validator = $this->container->get(ValidatorInterface::class);
         $data = json_encode($jsonBody);
@@ -107,7 +112,11 @@ class ExpensesControllerTest extends WebTestCase
                 CreateExpenseRequestDto::class => ['validator' => $validator],
             ],
         ]);
+
+        // Act
         $response = $this->controller->postExpense($createExpenseDto);
+
+        // Assert
         $this->assertEquals(400, $response->getStatusCode());
     }
 
@@ -168,6 +177,7 @@ class ExpensesControllerTest extends WebTestCase
     /** @test */
     public function postExpenseShouldThrowNotFoundExceptionOnNonExistingType(): void
     {
+        // Arrange
         /** @var ValidatorInterface $validator */
         $validator = $this->container->get(ValidatorInterface::class);
         $data = json_encode((object) [
@@ -180,6 +190,8 @@ class ExpensesControllerTest extends WebTestCase
                 CreateExpenseRequestDto::class => ['validator' => $validator],
             ],
         ]);
+
+        // Act | Assert
         $this->expectException(NotFoundException::class);
         $this->controller->postExpense($createExpenseDto);
     }
@@ -187,6 +199,7 @@ class ExpensesControllerTest extends WebTestCase
     /** @test */
     public function postExpenseShouldAddExpenseOnValidPayload(): void
     {
+        // Arrange
         /** @var ValidatorInterface $validator */
         $validator = $this->container->get(ValidatorInterface::class);
         $expectedExpense = [
@@ -199,8 +212,11 @@ class ExpensesControllerTest extends WebTestCase
                 CreateExpenseRequestDto::class => ['validator' => $validator],
             ],
         ]);
+
+        // Act
         $response = $this->controller->postExpense($createExpenseDto);
 
+        // Assert
         $this->assertEquals(201, $response->getStatusCode(), 'Should return 201 status code');
         $expenseRepository = $this->entityManager->getRepository(Expense::class);
         /** @var Expense $actualExpense */

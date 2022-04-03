@@ -34,6 +34,7 @@ class ExpenseTest extends KernelTestCase
     /** @test */
     public function shouldHaveFiveExpenseTypesFixturesFromStart()
     {
+        // Arrange
         $expenseTypeRepository = $this->entityManager->getRepository(ExpenseType::class);
 
         $expenseTypes = [
@@ -45,18 +46,25 @@ class ExpenseTest extends KernelTestCase
         ];
 
         foreach ($expenseTypes as $expenseType) {
+            // Act
             /** @var ExpenseType $expenseTypeRecord */
             $expenseTypeRecord = $expenseTypeRepository->findOneBy(['name' => $expenseType]);
+
+            // Assert
             $this->assertNotEmpty($expenseTypeRecord);
         }
 
+        // Act
         $allExpenseTypeCount = $expenseTypeRepository->count([]);
+
+        // Assert
         $this->assertEquals(count($expenseTypes), $allExpenseTypeCount);
     }
 
     /** @test */
     public function anExpenseCanBeCreatedInTheDatabase()
     {
+        // Arrange
         $expenseTypeRepository = $this->entityManager->getRepository(ExpenseType::class);
 
         /** @var ExpenseType $expenseTypeRecord */
@@ -70,6 +78,7 @@ class ExpenseTest extends KernelTestCase
         $expense->setValue($expenseValue);
         $expense->setExpenseType($expenseTypeRecord);
 
+        // Act
         $this->entityManager->persist($expense);
         $this->entityManager->flush();
 
@@ -81,6 +90,7 @@ class ExpenseTest extends KernelTestCase
             'value' => $expenseValue,
         ]);
 
+        // Assert
         $this->assertEquals($expenseDescription, $expenseRecord->getDescription());
         $this->assertEquals($expenseValue, $expenseRecord->getValue());
         $this->assertEquals(ExpenseTypeEnum::ENTERTAINMENT, $expenseRecord->getExpenseType()->getName());

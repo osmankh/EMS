@@ -43,6 +43,7 @@ class ExpensesControllerTest extends TestCase
     /** @test */
     public function getExpensesShouldReturnExpectedResponse(): void
     {
+        // Arrange
         $expected = (object) [
             'id' => $this->expenseMock->getId(),
             'description' => $this->expenseMock->getDescription(),
@@ -53,6 +54,10 @@ class ExpensesControllerTest extends TestCase
         $container = $this->createMock(ContainerInterface::class);
         $this->controller->setContainer($container);
 
-        $this->assertEquals(json_encode([$expected]), $this->controller->getExpenses()->getContent());
+        // Act
+        $content = $this->controller->getExpenses()->getContent();
+
+        // Assert
+        $this->assertEquals(json_encode([$expected]), $content);
     }
 }
