@@ -127,4 +127,41 @@ class ExpensesController extends AbstractController
 
         return new JsonResponse(ExpenseMapper::entityToResponseDto($entity), 201, ['Content-Type' => 'application/json']);
     }
+
+    /**
+     * Get Expense by id.
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Return matched expense by id",
+     *     @OA\JsonContent(ref=@Model(type=ExpenseResponseDto::class))
+     * )
+     *
+     * @OA\Response(
+     *     response=400,
+     *     description="Bad Request"
+     * )
+     *
+     * @OA\Response(
+     *     response=404,
+     *     description="Requested expense id not found"
+     * )
+     *
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="Id of Expense",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="expenses")
+     *
+     * @param int $id
+     *
+     * @return Response
+     */
+    #[Route('/expenses/{id}', name: 'get_expense_by_id', methods: ['GET'])]
+    public function getExpenseById(int $id): Response
+    {
+        return new JsonResponse([], 200, ['Content-Type' => 'application/json']);
+    }
 }
