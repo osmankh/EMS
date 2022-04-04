@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Dto\CreateExpenseRequestDto;
 use App\Dto\ExpenseResponseDto;
 use App\Dto\UpdateExpenseRequestDto;
-use App\Entity\Expense;
 use App\Exceptions\NotFoundException;
 use App\Mappers\ExpenseMapper;
 use App\Repository\ExpenseRepository;
