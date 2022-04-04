@@ -15,6 +15,7 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -166,8 +167,12 @@ class ExpensesController extends AbstractController
      * @return Response
      */
     #[Route('/expenses/{id}', name: 'get_expense_by_id', methods: ['GET'])]
-    public function getExpenseById(int $id): Response
+    public function getExpenseById(string $id): Response
     {
+        if (!is_numeric($id)) {
+            throw new BadRequestException('Expense Id must be of type int');
+        }
+
         $expense = $this->repository->find($id);
         if (!$expense) {
             throw new NotFoundException('Expense', $id);
