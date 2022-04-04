@@ -40,7 +40,7 @@ class ExpensesController extends AbstractController
      *        @OA\Items(ref=@Model(type=ExpenseResponseDto::class))
      *     )
      * )
-     * @OA\Tag(name="expenses")
+     * @OA\Tag(name="Expenses")
      *
      * @return Response
      */
@@ -97,7 +97,7 @@ class ExpensesController extends AbstractController
      *          )
      *      )
      * )
-     * @OA\Tag(name="expenses")
+     * @OA\Tag(name="Expenses")
      *
      * @param CreateExpenseRequestDto $createExpenseDto
      *
@@ -160,9 +160,9 @@ class ExpensesController extends AbstractController
      *     description="Id of Expense",
      *     @OA\Schema(type="integer")
      * )
-     * @OA\Tag(name="expenses")
+     * @OA\Tag(name="Expenses")
      *
-     * @param int $id
+     * @param string $id
      *
      * @return Response
      */
