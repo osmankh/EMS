@@ -283,6 +283,11 @@ class ExpensesController extends AbstractController
             $expense->setExpenseType($expenseType);
         }
 
+        try {
+            $this->repository->add($expense, true);
+        } catch (OptimisticLockException|ORMException $e) {
+        }
+
         return new JsonResponse(ExpenseMapper::entityToResponseDto($expense), 200, ['Content-Type' => 'application/json']);
     }
 
