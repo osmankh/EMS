@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
-class NotFoundException extends \RuntimeException
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+class NotFoundException extends NotFoundHttpException
 {
     public function __construct(string $entityName, int|string $id)
     {
