@@ -66,6 +66,12 @@ class ExpensesController extends AbstractController
      *     response=400,
      *     description="Bad Request"
      * )
+     *
+     * @OA\Response(
+     *     response=404,
+     *     description="Expense type not found"
+     * )
+     *
      * @OA\RequestBody(
      *      description="Expense details",
      *      @OA\MediaType(
