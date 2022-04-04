@@ -157,7 +157,7 @@ class ExpensesController extends AbstractController
      *     name="id",
      *     in="path",
      *     description="Id of Expense",
-     *     @OA\Schema(type="int")
+     *     @OA\Schema(type="integer")
      * )
      * @OA\Tag(name="expenses")
      *
@@ -168,6 +168,11 @@ class ExpensesController extends AbstractController
     #[Route('/expenses/{id}', name: 'get_expense_by_id', methods: ['GET'])]
     public function getExpenseById(int $id): Response
     {
-        return new JsonResponse([], 200, ['Content-Type' => 'application/json']);
+        $expense = $this->repository->find($id);
+        if (!$expense) {
+            throw new NotFoundException('Expense', $id);
+        }
+
+        return new JsonResponse(ExpenseMapper::entityToResponseDto($expense), 200, ['Content-Type' => 'application/json']);
     }
 }
