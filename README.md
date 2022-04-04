@@ -27,7 +27,7 @@ Repository for a simple Expense Management System
     * _In this implementation I've stored the types in DB instead of Enums just to avoid deployments on enum change_
 
 * Run `make run`
-  * To start symfony server
+  * To start symfony server.
 
 ## OpenAPI schema (Swagger)
 
