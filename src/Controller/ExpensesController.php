@@ -285,4 +285,54 @@ class ExpensesController extends AbstractController
 
         return new JsonResponse(ExpenseMapper::entityToResponseDto($expense), 200, ['Content-Type' => 'application/json']);
     }
+
+    /**
+     * Delete Expense by id.
+     *
+     * @OA\Response(
+     *     response=204,
+     *     description="No Content, Expense deleted"
+     * )
+     *
+     * @OA\Response(
+     *     response=400,
+     *     description="Bad Request"
+     * )
+     *
+     * @OA\Response(
+     *     response=404,
+     *     description="Expense id not found"
+     * )
+     *
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="Id of Expense to delete",
+     *     @OA\Schema(type="integer")
+     * )
+     * @OA\Tag(name="Expenses")
+     *
+     * @param string $id
+     *
+     * @return Response
+     */
+    #[Route('/expenses/{id}', name: 'delete_expense_by_id', methods: ['DELETE'])]
+    public function deleteExpenseById(string $id): Response
+    {
+        if (!is_numeric($id)) {
+            throw new BadRequestException('Expense Id must be of type int');
+        }
+
+        $expense = $this->repository->find($id);
+        if (!$expense) {
+            throw new NotFoundException('Expense', $id);
+        }
+
+        try {
+            $this->repository->remove($expense, true);
+        } catch (OptimisticLockException|ORMException $e) {
+        }
+
+        return new Response(null, 204, ['Content-Type' => 'application/json']);
+    }
 }
