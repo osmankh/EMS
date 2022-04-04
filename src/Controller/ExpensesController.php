@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Dto\CreateExpenseRequestDto;
 use App\Dto\ExpenseResponseDto;
+use App\Dto\UpdateExpenseRequestDto;
 use App\Entity\Expense;
 use App\Exceptions\NotFoundException;
 use App\Mappers\ExpenseMapper;
@@ -97,6 +98,7 @@ class ExpensesController extends AbstractController
      *          )
      *      )
      * )
+     *
      * @OA\Tag(name="Expenses")
      *
      * @param CreateExpenseRequestDto $createExpenseDto
@@ -176,6 +178,106 @@ class ExpensesController extends AbstractController
         $expense = $this->repository->find($id);
         if (!$expense) {
             throw new NotFoundException('Expense', $id);
+        }
+
+        return new JsonResponse(ExpenseMapper::entityToResponseDto($expense), 200, ['Content-Type' => 'application/json']);
+    }
+
+    /**
+     * Update Expense.
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Return updated Expense",
+     *     @OA\JsonContent(ref=@Model(type=ExpenseResponseDto::class))
+     * )
+     *
+     * @OA\Response(
+     *     response=400,
+     *     description="Bad Request"
+     * )
+     *
+     * @OA\Response(
+     *     response=404,
+     *     description="Requested expense id not found"
+     * )
+     *
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="Id of Expense",
+     *     @OA\Schema(type="integer")
+     * )
+     *
+     * @OA\RequestBody(
+     *      description="Expense fields to update",
+     *      @OA\MediaType(
+     *          mediaType="application/json",
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="description",
+     *                  description="Description of the Expense",
+     *                  type="string",
+     *              ),
+     *              @OA\Property(
+     *                  property="value",
+     *                  description="Value of the Expense",
+     *                  type="float"
+     *              ),
+     *              @OA\Property(
+     *                  property="type",
+     *                  description="Type of the Expense, you can specifies it by the Type name of id - (eg. 'Entertainment' or 1)",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     * @OA\Tag(name="Expenses")
+     *
+     * @param string                  $id
+     * @param UpdateExpenseRequestDto $updateBody
+     *
+     * @return Response
+     */
+    #[Route('/expenses/{id}', name: 'update_expense_by_id', methods: ['PATCH'])]
+    public function updateExpenseById(string $id, UpdateExpenseRequestDto $updateBody): Response
+    {
+        if (!is_numeric($id)) {
+            throw new BadRequestException('Expense Id must be of type int');
+        }
+
+        $expense = $this->repository->find($id);
+        if (!$expense) {
+            throw new NotFoundException('Expense', $id);
+        }
+
+        if (!$updateBody->valid()) {
+            return $updateBody->validationResponse();
+        }
+
+        $expenseType = null;
+
+        if ($updateBody->getType()) {
+            if (is_numeric($updateBody->getType())) {
+                $expenseType = $this->typeRepository->find($updateBody->getType());
+            } else {
+                $expenseType = $this->typeRepository->findOneBy([
+                    'name' => $updateBody->getType(),
+                ]);
+            }
+        }
+
+        if ($updateBody->getDescription()) {
+            $expense->setDescription($updateBody->getDescription());
+        }
+
+        if ($updateBody->getValue()) {
+            $expense->setValue($updateBody->getValue());
+        }
+
+        if ($expenseType) {
+            $expense->setExpenseType($expenseType);
         }
 
         return new JsonResponse(ExpenseMapper::entityToResponseDto($expense), 200, ['Content-Type' => 'application/json']);
