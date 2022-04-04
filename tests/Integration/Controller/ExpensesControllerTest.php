@@ -477,4 +477,36 @@ class ExpensesControllerTest extends KernelTestCase
         $this->assertSame($oldExpenseClone['typeId'], $newExpense->getExpenseType()->getId(), 'type should remain the same');
         $this->assertSame($oldExpenseClone['typeName'], $newExpense->getExpenseType()->getName(), 'type should remain the same');
     }
+
+    /** @test */
+    public function deleteExpenseByIdShouldReturnABadRequestOnInvalidIdType(): void
+    {
+        // Assert | Act
+        $this->expectException(BadRequestException::class);
+        $this->controller->deleteExpenseById('bad-string-id');
+    }
+
+    /** @test */
+    public function deleteExpenseByIdShouldThrowNotFoundExceptionOnNonExistingExpense(): void
+    {
+        $this->expectException(NotFoundException::class);
+        $this->controller->deleteExpenseById(10);
+    }
+
+    /** @test */
+    public function deleteExpenseByIdShouldDeleteExpenseFromDatabase(): void
+    {
+        $testFixtures = new TestFixtures();
+        $testFixtures->load($this->entityManager);
+        $expenseRepository = $this->entityManager->getRepository(Expense::class);
+        $allExpenses = $expenseRepository->findAll();
+        /** @var Expense $expense */
+        $expense = $allExpenses[0];
+
+        $response = $this->controller->deleteExpenseById($expense->getId());
+
+        $this->assertSame(204, $response->getStatusCode());
+        $this->assertLessThan($allExpenses, $expenseRepository->count([]));
+        $this->assertNull($expense->getId());
+    }
 }
