@@ -15,6 +15,7 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -39,7 +40,7 @@ class ExpensesController extends AbstractController
      *        @OA\Items(ref=@Model(type=ExpenseResponseDto::class))
      *     )
      * )
-     * @OA\Tag(name="expenses")
+     * @OA\Tag(name="Expenses")
      *
      * @return Response
      */
@@ -66,6 +67,12 @@ class ExpensesController extends AbstractController
      *     response=400,
      *     description="Bad Request"
      * )
+     *
+     * @OA\Response(
+     *     response=404,
+     *     description="Expense type not found"
+     * )
+     *
      * @OA\RequestBody(
      *      description="Expense details",
      *      @OA\MediaType(
@@ -90,7 +97,7 @@ class ExpensesController extends AbstractController
      *          )
      *      )
      * )
-     * @OA\Tag(name="expenses")
+     * @OA\Tag(name="Expenses")
      *
      * @param CreateExpenseRequestDto $createExpenseDto
      *
@@ -126,5 +133,51 @@ class ExpensesController extends AbstractController
         }
 
         return new JsonResponse(ExpenseMapper::entityToResponseDto($entity), 201, ['Content-Type' => 'application/json']);
+    }
+
+    /**
+     * Get Expense by id.
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Return matched expense by id",
+     *     @OA\JsonContent(ref=@Model(type=ExpenseResponseDto::class))
+     * )
+     *
+     * @OA\Response(
+     *     response=400,
+     *     description="Bad Request"
+     * )
+     *
+     * @OA\Response(
+     *     response=404,
+     *     description="Requested expense id not found"
+     * )
+     *
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="Id of Expense",
+     *     @OA\Schema(type="integer")
+     * )
+     * @OA\Tag(name="Expenses")
+     *
+     * @param string $id
+     *
+     * @return Response
+     */
+    #[Route('/expenses/{id}', name: 'get_expense_by_id', methods: ['GET'])]
+    public function getExpenseById(string $id): Response
+    {
+        if (!is_numeric($id)) {
+            throw new BadRequestException('Expense Id must be of type int');
+        }
+
+        $expense = $this->repository->find($id);
+        if (!$expense) {
+            throw new NotFoundException('Expense', $id);
+        }
+
+        return new JsonResponse(ExpenseMapper::entityToResponseDto($expense), 200, ['Content-Type' => 'application/json']);
     }
 }

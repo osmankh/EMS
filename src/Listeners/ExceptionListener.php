@@ -2,7 +2,6 @@
 
 namespace App\Listeners;
 
-use App\Exceptions\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,9 +25,7 @@ class ExceptionListener implements LoggerAwareInterface
 
         $this->logger->error($exception->getMessage(), $exception->getTrace());
 
-        if ($exception instanceof NotFoundException) {
-            $response->setStatusCode(Response::HTTP_NOT_FOUND);
-        } elseif ($exception instanceof HttpExceptionInterface) {
+        if ($exception instanceof HttpExceptionInterface) {
             $response->setStatusCode($exception->getStatusCode());
             $response->headers->replace($exception->getHeaders());
         } else {

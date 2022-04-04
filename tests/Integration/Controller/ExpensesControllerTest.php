@@ -7,27 +7,30 @@ use App\DataFixtures\TestFixtures;
 use App\Dto\CreateExpenseRequestDto;
 use App\Entity\Expense;
 use App\Entity\ExpenseType;
+use App\Enums\ExpenseTypeEnum;
 use App\Exceptions\NotFoundException;
 use App\Tests\DatabasePrimer;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use JetBrains\PhpStorm\ArrayShape;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ExpensesControllerTest extends WebTestCase
+class ExpensesControllerTest extends KernelTestCase
 {
-    /** @var EntityManagerInterface */
-    private $entityManager;
-    private $container;
+    private EntityManagerInterface $entityManager;
+    private ContainerInterface $container;
 
     /** @var ExpensesController */
     private $controller;
 
-    /** @var Serializer */
-    private $serializer;
+    private Serializer $serializer;
 
     protected function setUp(): void
     {
@@ -52,7 +55,6 @@ class ExpensesControllerTest extends WebTestCase
         parent::tearDown();
 
         $this->entityManager->close();
-        $this->entityManager = null;
     }
 
     /** @test */
@@ -120,6 +122,19 @@ class ExpensesControllerTest extends WebTestCase
         $this->assertSame(400, $response->getStatusCode());
     }
 
+    #[ArrayShape(
+        [
+            'Empty Body' => 'object[]',
+            'Missing Description' => 'object[]',
+            'Empty Description' => 'object[]',
+            'Missing Value' => 'object[]',
+            'Value as String' => 'object[]',
+            'Value as zero' => 'object[]',
+            'Negative Value' => 'object[]',
+            'Missing Type' => 'object[]',
+            'an Empty Type' => 'object[]',
+        ]
+    )]
     public function postExpenseBadBodyProvider(): array
     {
         $allData = [
@@ -174,7 +189,9 @@ class ExpensesControllerTest extends WebTestCase
         ];
     }
 
-    /** @test */
+    /** @test
+     * @throws InternalErrorException
+     */
     public function postExpenseShouldThrowNotFoundExceptionOnNonExistingType(): void
     {
         // Arrange
@@ -196,7 +213,9 @@ class ExpensesControllerTest extends WebTestCase
         $this->controller->postExpense($createExpenseDto);
     }
 
-    /** @test */
+    /** @test
+     * @throws InternalErrorException
+     */
     public function postExpenseShouldAddExpenseOnValidPayload(): void
     {
         // Arrange
@@ -228,7 +247,9 @@ class ExpensesControllerTest extends WebTestCase
         $this->assertSame($expectedExpense['type'], $actualExpense->getExpenseType()->getName(), 'Saved Expense type match payload type');
     }
 
-    /** @test */
+    /** @test
+     * @throws InternalErrorException
+     */
     public function postExpenseShouldKnowPayloadTypeIfIdPosted(): void
     {
         // Arrange
@@ -265,5 +286,50 @@ class ExpensesControllerTest extends WebTestCase
         $this->assertEquals($expectedExpense['value'], $actualExpense->getValue(), 'Saved Expense value match payload value');
         $this->assertSame($expenseType->getName(), $actualExpense->getExpenseType()->getName(), 'Saved Expense type match payload type');
         $this->assertSame($expenseType->getId(), $actualExpense->getExpenseType()->getId(), 'Saved Expense type Id match payload type Id');
+    }
+
+    /** @test */
+    public function getExpenseByIdShouldReturnABadRequestOnInvalidIdType(): void
+    {
+        // Assert | Act
+        $this->expectException(BadRequestException::class);
+        $this->controller->getExpenseById('bad-string-id');
+    }
+
+    /** @test */
+    public function getExpenseByIdShouldThrowNotFoundExceptionOnNonExistingExpense(): void
+    {
+        $this->expectException(NotFoundException::class);
+        $this->controller->getExpenseById(10);
+    }
+
+    /** @test */
+    public function getExpenseByIdShouldReturnExpectedExpense(): void
+    {
+        // Arrange
+        // Run Test DB Fixtures
+        $expectedExpense = (object) [
+            'description' => 'Test Description',
+            'value' => 12,
+            'type' => ExpenseTypeEnum::ENTERTAINMENT,
+        ];
+
+        $testFixtures = new TestFixtures();
+        $testFixtures->load(
+            $this->entityManager,
+            $expectedExpense->description,
+            $expectedExpense->value,
+            $expectedExpense->type,
+        );
+
+        $response = $this->controller->getExpenseById(1);
+
+        $actual = json_decode($response->getContent());
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(1, $actual->id);
+        $this->assertSame($expectedExpense->description, $actual->description);
+        $this->assertSame($expectedExpense->value, $actual->value);
+        $this->assertSame($expectedExpense->type, $actual->type);
     }
 }
