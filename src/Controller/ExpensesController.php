@@ -265,6 +265,10 @@ class ExpensesController extends AbstractController
                     'name' => $updateBody->getType(),
                 ]);
             }
+
+            if (!$expenseType) {
+                throw new NotFoundException('ExpenseType', $updateBody->getType());
+            }
         }
 
         if ($updateBody->getDescription()) {

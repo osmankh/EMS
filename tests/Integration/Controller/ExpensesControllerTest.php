@@ -5,6 +5,7 @@ namespace App\Tests\Integration\Controller;
 use App\Controller\ExpensesController;
 use App\DataFixtures\TestFixtures;
 use App\Dto\CreateExpenseRequestDto;
+use App\Dto\UpdateExpenseRequestDto;
 use App\Entity\Expense;
 use App\Entity\ExpenseType;
 use App\Enums\ExpenseTypeEnum;
@@ -331,5 +332,149 @@ class ExpensesControllerTest extends KernelTestCase
         $this->assertSame($expectedExpense->description, $actual->description);
         $this->assertSame($expectedExpense->value, $actual->value);
         $this->assertSame($expectedExpense->type, $actual->type);
+    }
+
+    /** @test */
+    public function patchExpenseByIdShouldThrowNotFoundExceptionOnNonExistingExpense(): void
+    {
+        // Arrange
+        /** @var ValidatorInterface $validator */
+        $validator = $this->container->get(ValidatorInterface::class);
+
+        $this->expectException(NotFoundException::class);
+        $this->controller->updateExpenseById(10, new UpdateExpenseRequestDto($validator));
+    }
+
+    /** @test
+     * @dataProvider patchExpenseBadBodyProvider
+     *
+     * @throws Exception
+     */
+    public function patchExpenseShouldReturnBadRequest(
+        object $jsonBody,
+    ): void {
+        $testFixtures = new TestFixtures();
+        $testFixtures->load($this->entityManager);
+
+        // Arrange
+        /** @var ValidatorInterface $validator */
+        $validator = $this->container->get(ValidatorInterface::class);
+        $data = json_encode($jsonBody);
+        $updateExpenseDto = $this->serializer->deserialize($data, UpdateExpenseRequestDto::class, 'json', [
+            'default_constructor_arguments' => [
+                UpdateExpenseRequestDto::class => ['validator' => $validator],
+            ],
+        ]);
+
+        // Act
+        $response = $this->controller->updateExpenseById(1, $updateExpenseDto);
+
+        // Assert
+        $this->assertSame(400, $response->getStatusCode());
+    }
+
+    public function patchExpenseBadBodyProvider(): array
+    {
+        $allData = [
+            'description' => 'Test Description',
+            'value' => 10,
+            'type' => 'Entertainment',
+        ];
+        $stringValue = [
+            ...$allData,
+            'value' => 'not-valid',
+        ];
+        $zeroValue = [
+            ...$allData,
+            'value' => 0,
+        ];
+        $negativeValue = [
+            ...$allData,
+            'value' => -1,
+        ];
+
+        return [
+            'Value as String' => [(object) $stringValue],
+            'Value as zero' => [(object) $zeroValue],
+            'Negative Value' => [(object) $negativeValue],
+        ];
+    }
+
+    /** @test */
+    public function patchExpenseShouldThrowNotFoundExceptionOnNonExistingType(): void
+    {
+        // Arrange
+        $testFixtures = new TestFixtures();
+        $testFixtures->load($this->entityManager);
+
+        /** @var ValidatorInterface $validator */
+        $validator = $this->container->get(ValidatorInterface::class);
+        $data = json_encode((object) [
+            'description' => 'Test Description',
+            'value' => 10,
+            'type' => 'Not Found',
+        ]);
+        $updateExpenseDto = $this->serializer->deserialize($data, UpdateExpenseRequestDto::class, 'json', [
+            'default_constructor_arguments' => [
+                UpdateExpenseRequestDto::class => ['validator' => $validator],
+            ],
+        ]);
+
+        // Act | Assert
+        $this->expectException(NotFoundException::class);
+        $this->controller->updateExpenseById(1, $updateExpenseDto);
+    }
+
+    /** @test */
+    public function patchExpenseShouldUpdateIntendedExpenseFieldsOnValidPayload(): void
+    {
+        // Arrange
+        $defaultExpense = (object) [
+            'description' => 'Test Description',
+            'value' => 12,
+            'type' => ExpenseTypeEnum::ENTERTAINMENT,
+        ];
+
+        $testFixtures = new TestFixtures();
+        $testFixtures->load(
+            $this->entityManager,
+            $defaultExpense->description,
+            $defaultExpense->value,
+            $defaultExpense->type,
+        );
+
+        $expenseRepository = $this->entityManager->getRepository(Expense::class);
+        /** @var Expense $oldExpense */
+        $oldExpense = $expenseRepository->findAll()[0];
+        $oldExpenseClone = [
+            'description' => $oldExpense->getDescription(),
+            'value' => $oldExpense->getValue(),
+            'typeId' => $oldExpense->getExpenseType()->getId(),
+            'typeName' => $oldExpense->getExpenseType()->getName(),
+        ];
+        /** @var ValidatorInterface $validator */
+        $validator = $this->container->get(ValidatorInterface::class);
+        $expectedExpense = [
+            'description' => "I'm an Updated Description",
+        ];
+        $updateExpenseDto = $this->serializer->deserialize(json_encode((object) $expectedExpense), UpdateExpenseRequestDto::class, 'json', [
+            'default_constructor_arguments' => [
+                UpdateExpenseRequestDto::class => ['validator' => $validator],
+            ],
+        ]);
+
+        // Act
+        $response = $this->controller->updateExpenseById($oldExpense->getId(), $updateExpenseDto);
+
+        /** @var Expense $newExpense */
+        $newExpense = $expenseRepository->find($oldExpense->getId());
+
+        // Assert
+        $this->assertSame(200, $response->getStatusCode(), 'Should return 200 status code');
+        $this->assertSame($expectedExpense['description'], $newExpense->getDescription(), 'Saved Expense description match payload description');
+        $this->assertNotEquals($oldExpenseClone['description'], $newExpense->getDescription(), 'Description should be different than the old one');
+        $this->assertEquals($oldExpenseClone['value'], $newExpense->getValue(), 'Value should remain the same');
+        $this->assertSame($oldExpenseClone['typeId'], $newExpense->getExpenseType()->getId(), 'type should remain the same');
+        $this->assertSame($oldExpenseClone['typeName'], $newExpense->getExpenseType()->getName(), 'type should remain the same');
     }
 }
