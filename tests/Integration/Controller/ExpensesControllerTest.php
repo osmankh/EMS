@@ -58,6 +58,15 @@ class ExpensesControllerTest extends KernelTestCase
         $this->entityManager->close();
     }
 
+    private function resetEntityManager(): void
+    {
+        if ($this->entityManager->isOpen()) {
+            $this->entityManager->close();
+        }
+
+        $this->entityManager = self::$kernel->getContainer()->get('doctrine')->getManager();
+    }
+
     /** @test */
     public function getExpensesShouldReturnEmptyData(): void
     {
@@ -278,6 +287,7 @@ class ExpensesControllerTest extends KernelTestCase
         // Assert
         $this->assertSame(201, $response->getStatusCode(), 'Should return 201 status code');
 
+        $this->resetEntityManager();
         $expenseRepository = $this->entityManager->getRepository(Expense::class);
         /** @var Expense $actualExpense */
         $actualExpense = $expenseRepository->findOneBy([
@@ -444,6 +454,7 @@ class ExpensesControllerTest extends KernelTestCase
         );
 
         $expenseRepository = $this->entityManager->getRepository(Expense::class);
+
         /** @var Expense $oldExpense */
         $oldExpense = $expenseRepository->findAll()[0];
         $oldExpenseClone = [
@@ -465,6 +476,8 @@ class ExpensesControllerTest extends KernelTestCase
 
         // Act
         $response = $this->controller->updateExpenseById($oldExpense->getId(), $updateExpenseDto);
+
+        $this->resetEntityManager();
 
         /** @var Expense $newExpense */
         $newExpense = $expenseRepository->find($oldExpense->getId());
