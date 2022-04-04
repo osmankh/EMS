@@ -23,7 +23,8 @@ Repository for a simple Expense Management System
   * Dev database using docker
   * Install composer dependencies
   * Create and migrate the database
-  * Seed initial Expense Types (In this implementation I've stored the types in DB instead of Enums just to avoid deployments on enum change)
+  * Seed initial Expense Types
+    * _In this implementation I've stored the types in DB instead of Enums just to avoid deployments on enum change_
 
 * Run `make run`
   * To start symfony server
